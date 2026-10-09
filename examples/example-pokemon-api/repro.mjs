@@ -38,7 +38,10 @@ try {
 
   const schema = originals[0].toString();
   if (!schema.includes(QUERY_END)) throw new Error('schema.graphql changed; update QUERY_END');
-  await writeFile(schemaFile, schema.replace(QUERY_END, QUERY_END.replace('}', UNRELATED_FIELD + '}')));
+  await writeFile(
+    schemaFile,
+    schema.replace(QUERY_END, QUERY_END.replace('}', UNRELATED_FIELD + '}'))
+  );
 
   await regenerate();
   const after = await readHashes();
@@ -49,8 +52,12 @@ try {
     if (!same) changed++;
     console.log(`${same ? 'unchanged' : 'CHANGED  '}  ${key.slice(0, 60)}`);
   }
-  console.log(`\n${changed} of ${before.size} document hashes changed after adding \`Query.unrelated\`.`);
-  console.log(changed ? 'BUG: no document selects that field.' : 'OK: only affected documents change.');
+  console.log(
+    `\n${changed} of ${before.size} document hashes changed after adding \`Query.unrelated\`.`
+  );
+  console.log(
+    changed ? 'BUG: no document selects that field.' : 'OK: only affected documents change.'
+  );
   process.exitCode = changed ? 1 : 0;
 } finally {
   // Restore the committed files so the repro leaves no diff behind.
